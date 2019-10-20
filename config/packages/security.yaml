@@ -1,22 +1,37 @@
 security:
-    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
-    providers:
-        in_memory: { memory: null }
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-            anonymous: true
+  encoders:
+    App\Entity\User: bcrypt
+  # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+  providers:
+    database:
+      entity: { class: App\Entity\User, property: username }
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    main:
+      anonymous: true
+      pattern: ^/
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#firewalls-authentication
+      # activate different ways to authenticate
+      # https://symfony.com/doc/current/security.html#firewalls-authentication
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+      # https://symfony.com/doc/current/security/impersonating_user.html
+      # switch_user: true
+      form_login:
+        check_path: security_login
+        login_path: security_login
+        csrf_token_generator: security.csrf.token_manager
+        default_target_path: micro_post_index
+      #        always_use_default_path: false
+      #        use_referer: true
+      #        failure_path:
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+      logout:
+        path: security_logout
+        target: micro_post_index
+  # Easy way to control access for large sections of your site
+  # Note: Only the *first* access control that matches will be used
+  access_control:
+  #    - { path: ^/micro-post, roles: ROLE_USER }
+  # - { path: ^/profile, roles: ROLE_USER }

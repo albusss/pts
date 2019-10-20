@@ -1,5 +1,6 @@
 /.idea
 /node_modules
+/.docker-sync
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
