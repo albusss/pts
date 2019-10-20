@@ -16,6 +16,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User implements UserInterface, \Serializable
 {
+    public const ROLE_ADMIN = 'ROLE_ADMIN';
+
+    public const ROLE_USER = 'ROLE_USER';
+
     /**
      * @ORM\Column(type="string", length=254, unique=true)
      * @Assert\NotBlank()
@@ -52,6 +56,11 @@ class User implements UserInterface, \Serializable
      * @ORM\OneToMany(targetEntity="App\Entity\MicroPost", mappedBy="user")
      */
     private $posts;
+
+    /**
+     * @ORM\Column(type="simple_array")
+     */
+    private $roles;
 
     /**
      * @ORM\Column(type="string", length=50, unique=true)
@@ -114,9 +123,7 @@ class User implements UserInterface, \Serializable
 
     public function getRoles()
     {
-        return [
-            'ROLE_USER'
-        ];
+        return $this->roles;
     }
 
     public function getSalt()
@@ -174,6 +181,20 @@ class User implements UserInterface, \Serializable
     public function setPlainPassword($plainPassword = null): self
     {
         $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    /**
+     *
+     *
+     * @param mixed $roles
+     *
+     * @return self
+     */
+    public function setRoles(array $roles = null): self
+    {
+        $this->roles = $roles;
 
         return $this;
     }

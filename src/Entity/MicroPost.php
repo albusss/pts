@@ -29,7 +29,7 @@ class MicroPost
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="posts")
-     * @ORM\JoinColumn()
+     * @ORM\JoinColumn(nullable=false)
      */
     private $user;
 
@@ -49,9 +49,7 @@ class MicroPost
     }
 
     /**
-     *
-     *
-     * @return mixed
+     * @return User
      */
     public function getUser()
     {

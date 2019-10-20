@@ -4,17 +4,16 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\MicroPost;
+use App\Entity\User;
 use App\Form\MicroPostType;
 use App\Repository\MicroPostRepository;
+use App\Security\MicroPostVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 /**
@@ -28,24 +27,9 @@ final class MicroPostController extends AbstractController
     private $entityManager;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
-     */
-    private $flashBag;
-
-    /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
      * @var MicroPostRepository
      */
     private $repository;
-
-    /**
-     * @var \Symfony\Component\Routing\RouterInterface
-     */
-    private $router;
 
     /**
      * @var \Twig\Environment
@@ -57,25 +41,16 @@ final class MicroPostController extends AbstractController
      *
      * @param \App\Repository\MicroPostRepository $repository
      * @param \Twig\Environment $twig
-     * @param \Symfony\Component\Form\FormFactoryInterface $formFactory
      * @param \Doctrine\ORM\EntityManagerInterface $entityManager
-     * @param \Symfony\Component\Routing\RouterInterface $router
-     * @param \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface $flashBag
      */
     public function __construct(
         MicroPostRepository $repository,
         Environment $twig,
-        FormFactoryInterface $formFactory,
-        EntityManagerInterface $entityManager,
-        RouterInterface $router,
-        FlashBagInterface $flashBag
+        EntityManagerInterface $entityManager
     ) {
         $this->repository = $repository;
         $this->twig = $twig;
-        $this->formFactory = $formFactory;
         $this->entityManager = $entityManager;
-        $this->router = $router;
-        $this->flashBag = $flashBag;
     }
 
     /**
@@ -91,17 +66,23 @@ final class MicroPostController extends AbstractController
      */
     public function add(Request $request)
     {
+        if ($this->isGranted(User::ROLE_USER) === false) {
+            return $this->redirectToRoute('security_login');
+        }
+        $user = $this->getUser();
         $microPost = new  MicroPost();
-        $microPost->setTime(new \DateTime());
+        $microPost
+            ->setTime(new \DateTime())
+            ->setUser($user);
 
-        $form = $this->formFactory->create(MicroPostType::class, $microPost);
+        $form = $this->createForm(MicroPostType::class, $microPost);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->persist($microPost);
             $this->entityManager->flush();
 
-            return new RedirectResponse($this->router->generate('micro_post_index'));
+            return new RedirectResponse($this->generateUrl('micro_post_index'));
         }
 
         return new Response(
@@ -119,12 +100,14 @@ final class MicroPostController extends AbstractController
      */
     public function delete(MicroPost $post)
     {
+        $this->denyAccessUnlessGranted(MicroPostVoter::EDIT, $post);
+
         $this->entityManager->remove($post);
         $this->entityManager->flush();
 
-        $this->flashBag->add('notice', 'micro post was deleted');
+        $this->addFlash('notice', 'micro post was deleted');
 
-        return new RedirectResponse($this->router->generate('micro_post_index'));
+        return new RedirectResponse($this->generateUrl('micro_post_index'));
     }
 
     /**
@@ -139,13 +122,15 @@ final class MicroPostController extends AbstractController
      */
     public function edit(MicroPost $post, Request $request)
     {
-        $form = $this->formFactory->create(MicroPostType::class, $post);
+        $this->denyAccessUnlessGranted(MicroPostVoter::EDIT, $post);
+
+        $form = $this->createForm(MicroPostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
 
-            return new RedirectResponse($this->router->generate('micro_post_index'));
+            return new RedirectResponse($this->generateUrl('micro_post_index'));
         }
 
         return new Response(

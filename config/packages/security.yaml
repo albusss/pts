@@ -1,4 +1,6 @@
 security:
+  access_decision_manager:
+    strategy: affirmative
   encoders:
     App\Entity\User: bcrypt
   # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
@@ -35,3 +37,6 @@ security:
   access_control:
   #    - { path: ^/micro-post, roles: ROLE_USER }
   # - { path: ^/profile, roles: ROLE_USER }
+
+  role_hierarchy:
+    ROLE_ADMIN: ROLE_USER
