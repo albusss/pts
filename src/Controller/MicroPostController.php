@@ -6,15 +6,12 @@ namespace App\Controller;
 use App\Entity\MicroPost;
 use App\Entity\User;
 use App\Form\MicroPostType;
-use App\Repository\MicroPostRepository;
 use App\Security\MicroPostVoter;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Twig\Environment;
 
 /**
  * @Route("/micro-post")
@@ -22,47 +19,13 @@ use Twig\Environment;
 final class MicroPostController extends AbstractController
 {
     /**
-     * @var \Doctrine\ORM\EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var MicroPostRepository
-     */
-    private $repository;
-
-    /**
-     * @var \Twig\Environment
-     */
-    private $twig;
-
-    /**
-     * MicroPostController constructor.
-     *
-     * @param \App\Repository\MicroPostRepository $repository
-     * @param \Twig\Environment $twig
-     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
-     */
-    public function __construct(
-        MicroPostRepository $repository,
-        Environment $twig,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->repository = $repository;
-        $this->twig = $twig;
-        $this->entityManager = $entityManager;
-    }
-
-    /**
      * @Route("/add", name="micro_post_add")
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws \Exception
      */
     public function add(Request $request)
     {
@@ -71,22 +34,21 @@ final class MicroPostController extends AbstractController
         }
         $user = $this->getUser();
         $microPost = new  MicroPost();
-        $microPost
-            ->setTime(new \DateTime())
-            ->setUser($user);
+        $microPost->setUser($user);
 
         $form = $this->createForm(MicroPostType::class, $microPost);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->persist($microPost);
-            $this->entityManager->flush();
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($microPost);
+            $em->flush();
 
             return new RedirectResponse($this->generateUrl('micro_post_index'));
         }
 
         return new Response(
-            $this->twig->render('micro-post/add.html.twig', [
+            $this->renderView('micro-post/add.html.twig', [
                 'form' => $form->createView()
             ])
         );
@@ -94,6 +56,7 @@ final class MicroPostController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="micro_post_delete")
+     *
      * @param \App\Entity\MicroPost $post
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
@@ -102,8 +65,9 @@ final class MicroPostController extends AbstractController
     {
         $this->denyAccessUnlessGranted(MicroPostVoter::EDIT, $post);
 
-        $this->entityManager->remove($post);
-        $this->entityManager->flush();
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($post);
+        $em->flush();
 
         $this->addFlash('notice', 'micro post was deleted');
 
@@ -112,13 +76,11 @@ final class MicroPostController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="micro_post_edit")
+     *
      * @param \App\Entity\MicroPost $post
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
      */
     public function edit(MicroPost $post, Request $request)
     {
@@ -128,13 +90,14 @@ final class MicroPostController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->flush();
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
 
             return new RedirectResponse($this->generateUrl('micro_post_index'));
         }
 
         return new Response(
-            $this->twig->render('micro-post/add.html.twig', [
+            $this->renderView('micro-post/add.html.twig', [
                 'form' => $form->createView()
             ])
         );
@@ -144,15 +107,12 @@ final class MicroPostController extends AbstractController
      * @Route("/", name="micro_post_index")
      *
      * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
      */
     public function index(): Response
     {
-        $html = $this->twig->render('micro-post/index.html.twig', [
-            'posts' => $this->repository->findBy([], ['time' => 'DESC'])
+        $repo = $this->getDoctrine()->getRepository(MicroPost::class);
+        $html = $this->renderView('micro-post/index.html.twig', [
+            'posts' => $repo->findBy([], ['time' => 'DESC'])
         ]);
 
         return new Response($html);
@@ -163,16 +123,28 @@ final class MicroPostController extends AbstractController
      * @param \App\Entity\MicroPost $post
      *
      * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
      */
     public function post(MicroPost $post)
     {
         return new Response(
-            $this->twig->render('micro-post/post.html.twig', [
+            $this->renderView('micro-post/post.html.twig', [
                 'post' => $post
             ])
         );
+    }
+
+    /**
+     *
+     * @Route("user/{username}", name="micro_post_user")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function userPosts(User $user)
+    {
+        $html = $this->renderView('micro-post/index.html.twig', [
+            'posts' => $user->getPosts()
+        ]);
+
+        return new Response($html);
     }
 }

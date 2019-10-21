@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MicroPostRepository")
  * @ORM\Table()
+ * @ORM\HasLifecycleCallbacks()
  */
 class MicroPost
 {
@@ -68,6 +69,17 @@ class MicroPost
         $this->time = $time;
 
         return $this;
+    }
+
+    /**
+     *
+     * @ORM\PrePersist()
+     *
+     * @throws \Exception
+     */
+    public function setTimeOnPersist()
+    {
+        $this->time = new \DateTime();
     }
 
     /**
