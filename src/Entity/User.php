@@ -28,6 +28,20 @@ class User implements UserInterface, \Serializable
     private $email;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="following")
+     */
+    private $followers;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="followers")
+     * @ORM\JoinTable(name="following",
+     *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="following_user_id", referencedColumnName="id")}
+     * )
+     */
+    private $following;
+
+    /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Length(max="50", min="4")
@@ -75,6 +89,8 @@ class User implements UserInterface, \Serializable
     public function __construct()
     {
         $this->posts = new ArrayCollection();
+        $this->followers = new ArrayCollection();
+        $this->following = new ArrayCollection();
     }
 
     public function eraseCredentials()
@@ -84,6 +100,26 @@ class User implements UserInterface, \Serializable
     public function getEmail(): ?string
     {
         return $this->email;
+    }
+
+    /**
+     *
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFollowers()
+    {
+        return $this->followers;
+    }
+
+    /**
+     *
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFollowing()
+    {
+        return $this->following;
     }
 
     public function getFullName(): ?string

@@ -135,14 +135,15 @@ final class MicroPostController extends AbstractController
 
     /**
      *
-     * @Route("user/{username}", name="micro_post_user")
+     * @Route("/user/{username}", name="micro_post_user")
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function userPosts(User $user)
     {
-        $html = $this->renderView('micro-post/index.html.twig', [
-            'posts' => $user->getPosts()
+        $html = $this->renderView('micro-post/user-posts.html.twig', [
+            'posts' => $user->getPosts(),
+            'user' => $user,
         ]);
 
         return new Response($html);
