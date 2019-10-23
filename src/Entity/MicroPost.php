@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,6 +20,15 @@ class MicroPost
     private $id;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="postsLiked")
+     * @ORM\JoinTable(name="post_likes",
+     *     joinColumns={@ORM\JoinColumn(name="post_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     * )
+     */
+    private $likedBy;
+
+    /**
      * @ORM\Column(type="string", length=280)
      */
     private $text;
@@ -34,9 +44,27 @@ class MicroPost
      */
     private $user;
 
+    /**
+     * MicroPost constructor.
+     */
+    public function __construct()
+    {
+        $this->likedBy = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     *
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getLikedBy()
+    {
+        return $this->likedBy;
     }
 
     public function getText(): ?string
@@ -55,6 +83,13 @@ class MicroPost
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function like(User $user)
+    {
+        if ($this->likedBy->contains($user) === false) {
+            $this->likedBy->add($user);
+        }
     }
 
     public function setText(string $text): self

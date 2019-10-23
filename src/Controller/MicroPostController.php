@@ -110,12 +110,28 @@ final class MicroPostController extends AbstractController
      */
     public function index(): Response
     {
-        $repo = $this->getDoctrine()->getRepository(MicroPost::class);
-        $html = $this->renderView('micro-post/index.html.twig', [
-            'posts' => $repo->findBy([], ['time' => 'DESC'])
-        ]);
+        /** @var \App\Repository\MicroPostRepository $postRepository */
+        $postRepository = $this->getDoctrine()->getRepository(MicroPost::class);
+        /** @var \App\Repository\UserRepository $userRepository */
+        $userRepository = $this->getDoctrine()->getRepository(User::class);
+        $currentUser = $this->getUser();
+        $usersToFollow = [];
+        if ($currentUser instanceof User) {
+            $posts = $postRepository->findAllByUsers($currentUser->getFollowing());
+            $usersToFollow = \count($posts) === 0
+                ? $userRepository->findAllMoreThanPostsExceptUser(5, $currentUser)
+                : [];
+        } else {
+            $posts = $postRepository->findBy([], ['time' => 'DESC']);
+        }
 
-        return new Response($html);
+        return new Response($this->renderView(
+            'micro-post/index.html.twig',
+            [
+                'posts' => $posts,
+                'usersToFollow' => $usersToFollow
+            ]
+        ));
     }
 
     /**

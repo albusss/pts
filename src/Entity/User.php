@@ -72,6 +72,11 @@ class User implements UserInterface, \Serializable
     private $posts;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\MicroPost", mappedBy="likedBy")
+     */
+    private $postsLiked;
+
+    /**
      * @ORM\Column(type="simple_array")
      */
     private $roles;
@@ -91,10 +96,28 @@ class User implements UserInterface, \Serializable
         $this->posts = new ArrayCollection();
         $this->followers = new ArrayCollection();
         $this->following = new ArrayCollection();
+        $this->postsLiked = new ArrayCollection();
+    }
+
+    /**
+     *
+     *
+     * @return mixed
+     */
+    public function getPostsLiked()
+    {
+        return $this->postsLiked;
     }
 
     public function eraseCredentials()
     {
+    }
+
+    public function follow(User $user)
+    {
+        if ($this->getFollowing()->contains($user) === false) {
+            $this->getFollowing()->add($user);
+        }
     }
 
     public function getEmail(): ?string
