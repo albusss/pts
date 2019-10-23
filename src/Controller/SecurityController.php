@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -17,13 +16,13 @@ final class SecurityController extends AbstractController
      */
     public function login(AuthenticationUtils $utils)
     {
-        return new Response($this->render(
+        return $this->render(
             'security/login.html.twig',
             [
                 'last_username' => $utils->getLastUsername(),
                 'error' => $utils->getLastAuthenticationError()
             ]
-        ));
+        );
     }
 
     /**

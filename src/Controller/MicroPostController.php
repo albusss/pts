@@ -47,11 +47,9 @@ final class MicroPostController extends AbstractController
             return new RedirectResponse($this->generateUrl('micro_post_index'));
         }
 
-        return new Response(
-            $this->renderView('micro-post/add.html.twig', [
-                'form' => $form->createView()
-            ])
-        );
+        return $this->render('micro-post/add.html.twig', [
+            'form' => $form->createView()
+        ]);
     }
 
     /**
@@ -96,11 +94,7 @@ final class MicroPostController extends AbstractController
             return new RedirectResponse($this->generateUrl('micro_post_index'));
         }
 
-        return new Response(
-            $this->renderView('micro-post/add.html.twig', [
-                'form' => $form->createView()
-            ])
-        );
+        return $this->render('micro-post/add.html.twig', ['form' => $form->createView()]);
     }
 
     /**
@@ -125,13 +119,13 @@ final class MicroPostController extends AbstractController
             $posts = $postRepository->findBy([], ['time' => 'DESC']);
         }
 
-        return new Response($this->renderView(
+        return $this->render(
             'micro-post/index.html.twig',
             [
                 'posts' => $posts,
                 'usersToFollow' => $usersToFollow
             ]
-        ));
+        );
     }
 
     /**
@@ -142,11 +136,9 @@ final class MicroPostController extends AbstractController
      */
     public function post(MicroPost $post)
     {
-        return new Response(
-            $this->renderView('micro-post/post.html.twig', [
-                'post' => $post
-            ])
-        );
+        return $this->render('micro-post/post.html.twig', [
+            'post' => $post
+        ]);
     }
 
     /**
@@ -157,11 +149,9 @@ final class MicroPostController extends AbstractController
      */
     public function userPosts(User $user)
     {
-        $html = $this->renderView('micro-post/user-posts.html.twig', [
+        return $this->render('micro-post/user-posts.html.twig', [
             'posts' => $user->getPosts(),
             'user' => $user,
         ]);
-
-        return new Response($html);
     }
 }

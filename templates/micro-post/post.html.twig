@@ -50,15 +50,17 @@
 
                 button.disabled = true;
 
-                fetch(path, {'credentials': "include"}).then(function (response) {
-                    response.json().then(function (json) {
-                        likeCount.innerText = json.count;
-                        switchButtons(button, oppositeButton);
+                fetch(path, {'credentials': "include"})
+                    .then(function (response) {
+                        response.json()
+                            .then(function (json) {
+                                likeCount.innerText = json.count;
+                                switchButtons(button, oppositeButton);
+                            })
                     })
-                }).catch(function () {
-                    switchButtons(button, oppositeButton);
-                });
-
+                    .catch(function () {
+                        switchButtons(button, oppositeButton);
+                    });
                 event.preventDefault()
             });
         }
