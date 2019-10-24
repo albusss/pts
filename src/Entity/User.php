@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -14,11 +14,16 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity(fields={"email"}, message="This email is already used")
  * @UniqueEntity(fields={"username"}, message="This username is already used")
  */
-class User implements UserInterface, \Serializable
+class User implements AdvancedUserInterface, \Serializable
 {
     public const ROLE_ADMIN = 'ROLE_ADMIN';
 
     public const ROLE_USER = 'ROLE_USER';
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $confirmationToken;
 
     /**
      * @ORM\Column(type="string", length=254, unique=true)
@@ -26,6 +31,11 @@ class User implements UserInterface, \Serializable
      * @Assert\Email()
      */
     private $email;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $enabled;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="following")
@@ -97,16 +107,7 @@ class User implements UserInterface, \Serializable
         $this->followers = new ArrayCollection();
         $this->following = new ArrayCollection();
         $this->postsLiked = new ArrayCollection();
-    }
-
-    /**
-     *
-     *
-     * @return mixed
-     */
-    public function getPostsLiked()
-    {
-        return $this->postsLiked;
+        $this->enabled = false;
     }
 
     public function eraseCredentials()
@@ -120,9 +121,29 @@ class User implements UserInterface, \Serializable
         }
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
+    public function getConfirmationToken()
+    {
+        return $this->confirmationToken;
+    }
+
     public function getEmail(): ?string
     {
         return $this->email;
+    }
+
+    /**
+     *
+     *
+     * @return mixed
+     */
+    public function getEnabled()
+    {
+        return $this->enabled;
     }
 
     /**
@@ -180,6 +201,16 @@ class User implements UserInterface, \Serializable
         return $this->posts;
     }
 
+    /**
+     *
+     *
+     * @return mixed
+     */
+    public function getPostsLiked()
+    {
+        return $this->postsLiked;
+    }
+
     public function getRoles()
     {
         return $this->roles;
@@ -193,6 +224,35 @@ class User implements UserInterface, \Serializable
     public function getUsername(): ?string
     {
         return $this->username;
+    }
+
+    /**
+     *
+     */
+    public function isAccountNonExpired()
+    {
+        return true;
+    }
+
+    /**
+     */
+    public function isAccountNonLocked()
+    {
+        return true;
+    }
+
+    /**
+     */
+    public function isCredentialsNonExpired()
+    {
+        return true;
+    }
+
+    /**
+     */
+    public function isEnabled()
+    {
+        return $this->enabled;
     }
 
     /**
@@ -211,9 +271,37 @@ class User implements UserInterface, \Serializable
         ]);
     }
 
+    /**
+     *
+     *
+     * @param mixed $confirmationToken
+     *
+     * @return static
+     */
+    public function setConfirmationToken($confirmationToken = null): self
+    {
+        $this->confirmationToken = $confirmationToken;
+
+        return $this;
+    }
+
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     *
+     *
+     * @param mixed $enabled
+     *
+     * @return static
+     */
+    public function setEnabled($enabled = null): self
+    {
+        $this->enabled = $enabled;
 
         return $this;
     }

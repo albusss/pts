@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
+    app_email: '%env(MAILER_FROM)%'
 
 services:
     # default configuration for services in *this* file
@@ -27,6 +28,10 @@ services:
     App\Twig\AppExtension:
         arguments:
             $locale: '%locale%'
+
+    App\Mailer\Mailer:
+        arguments:
+            $mailFrom: '%app_email%'
 
     App\EventListener\LikeNotificationSubscriber:
         tags:
