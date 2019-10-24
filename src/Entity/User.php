@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity(fields={"email"}, message="This email is already used")
  * @UniqueEntity(fields={"username"}, message="This username is already used")
  */
-class User implements AdvancedUserInterface, \Serializable
+class User implements UserInterface, \Serializable
 {
     public const ROLE_ADMIN = 'ROLE_ADMIN';
 
@@ -227,35 +227,6 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
-     *
-     */
-    public function isAccountNonExpired()
-    {
-        return true;
-    }
-
-    /**
-     */
-    public function isAccountNonLocked()
-    {
-        return true;
-    }
-
-    /**
-     */
-    public function isCredentialsNonExpired()
-    {
-        return true;
-    }
-
-    /**
-     */
-    public function isEnabled()
-    {
-        return $this->enabled;
-    }
-
-    /**
      * String representation of object
      *
      * @link https://php.net/manual/en/serializable.serialize.php
@@ -267,7 +238,8 @@ class User implements AdvancedUserInterface, \Serializable
         return \serialize([
             $this->id,
             $this->username,
-            $this->password
+            $this->password,
+            $this->enabled
         ]);
     }
 
@@ -370,7 +342,8 @@ class User implements AdvancedUserInterface, \Serializable
         [
             $this->id,
             $this->username,
-            $this->password
+            $this->password,
+            $this->enabled
         ] = \unserialize($serialized);
     }
 }
