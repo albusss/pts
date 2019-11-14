@@ -12,7 +12,7 @@ final class MicroPostControllerTest extends WebTestCase
      *
      * @return void
      */
-    public function testLike(): void
+    public function testIndex(): void
     {
         $client = static::createClient();
 

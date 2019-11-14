@@ -40,6 +40,8 @@ final class LikesController extends AbstractController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
+     * @throws \Doctrine\ORM\ORMException
+     *
      * @Route("/like/{id}", name="likes_like")
      */
     public function like(MicroPost $post): Response
@@ -63,6 +65,8 @@ final class LikesController extends AbstractController
      * @param \App\Entity\MicroPost $post
      *
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Doctrine\ORM\ORMException
      *
      * @Route("/unlike/{id}", name="likes_unlike")
      */

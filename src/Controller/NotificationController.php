@@ -40,6 +40,8 @@ final class NotificationController extends AbstractController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
+     * @throws \Doctrine\ORM\ORMException
+     *
      * @Route("/acknowledge/{id}", name="notification_acknowledge")
      */
     public function acknowledge(Notification $notification): Response
