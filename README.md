@@ -13,9 +13,7 @@
 * Symfony Forms
 * Symfony translation
 
-#### What is this project and what can you do.
-
-The following features are available in this app: 
+#### The following features are available in this app: 
 * Register an account
 * Create posts
 * Like posts
