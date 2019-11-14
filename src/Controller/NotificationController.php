@@ -86,6 +86,8 @@ final class NotificationController extends AbstractController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     *
      * @Route("/unread-count", name="notification_unread")
      */
     public function unreadCount(): Response

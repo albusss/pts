@@ -39,6 +39,10 @@ final class UserSubscriber implements EventSubscriberInterface
      * @param \App\Event\UserRegisterEvent $event
      *
      * @return void
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
     public function onUserRegister(UserRegisterEvent $event): void
     {

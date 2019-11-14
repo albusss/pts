@@ -16,6 +16,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 final class RegisterController extends AbstractController
 {
     /**
+     * Register an Account.
+     *
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param \Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface $encoder
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
