@@ -5,23 +5,23 @@ namespace App\Service\Like;
 
 use App\Entity\MicroPost;
 use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\LikeNotificationRepositoryInterface;
 
 final class LikeService implements LikeServiceInterface
 {
     /**
-     * @var \Doctrine\ORM\EntityManagerInterface
+     * @var \App\Repository\LikeNotificationRepository
      */
-    private $entityManager;
+    private $repository;
 
     /**
      * LikeService constructor.
      *
-     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+     * @param \App\Repository\LikeNotificationRepositoryInterface $repository
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(LikeNotificationRepositoryInterface $repository)
     {
-        $this->entityManager = $entityManager;
+        $this->repository = $repository;
     }
 
     /**
@@ -31,7 +31,7 @@ final class LikeService implements LikeServiceInterface
     {
         $post->like($currentUser);
 
-        $this->entityManager->flush();
+        $this->repository->save($post);
     }
 
     /**
@@ -41,6 +41,6 @@ final class LikeService implements LikeServiceInterface
     {
         $post->getLikedBy()->removeElement($currentUser);
 
-        $this->entityManager->flush();
+        $this->repository->save($post);
     }
 }

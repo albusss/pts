@@ -5,23 +5,23 @@ namespace App\Service\Notification;
 
 use App\Entity\Notification;
 use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\NotificationRepositoryInterface;
 
 final class NotificationService implements NotificationServiceInterface
 {
     /**
-     * @var \Doctrine\ORM\EntityManagerInterface
+     * @var \App\Repository\NotificationRepositoryInterface
      */
-    private $entityManager;
+    private $repository;
 
     /**
      * NotificationService constructor.
      *
-     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+     * @param \App\Repository\NotificationRepositoryInterface $repository
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(NotificationRepositoryInterface $repository)
     {
-        $this->entityManager = $entityManager;
+        $this->repository = $repository;
     }
 
     /**
@@ -31,7 +31,7 @@ final class NotificationService implements NotificationServiceInterface
     {
         $notification->setSeen(true);
 
-        $this->entityManager->flush();
+        $this->repository->save($notification);
     }
 
     /**
@@ -39,12 +39,7 @@ final class NotificationService implements NotificationServiceInterface
      */
     public function acknowledgeAll(User $currentUser): void
     {
-        /** @var \App\Repository\NotificationRepository $repo */
-        $repo = $this->entityManager->getRepository(Notification::class);
-
-        $repo->markAllAsReadByUser($currentUser);
-
-        $this->entityManager->flush();
+        $this->repository->markAllAsReadByUser($currentUser);
     }
 
     /**
@@ -52,11 +47,8 @@ final class NotificationService implements NotificationServiceInterface
      */
     public function notifications(User $currentUser): array
     {
-        /** @var \App\Repository\NotificationRepository $repo */
-        $repo = $this->entityManager->getRepository(Notification::class);
-
         return
-            $repo->findBy(
+            $this->repository->findBy(
                 [
                     'seen' => false,
                     'user' => $currentUser,
@@ -69,9 +61,6 @@ final class NotificationService implements NotificationServiceInterface
      */
     public function unreadCount(User $currentUser): int
     {
-        /** @var \App\Repository\NotificationRepository $repo */
-        $repo = $this->entityManager->getRepository(Notification::class);
-
-        return $repo->findUnseenByUser($currentUser);
+        return $this->repository->findUnseenByUser($currentUser);
     }
 }

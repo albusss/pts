@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,7 +29,7 @@ class MicroPost
      *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
      * )
      *
-     * @var \App\Entity\User[]|null
+     * @var \Doctrine\Common\Collections\Collection
      */
     private $likedBy;
 
@@ -71,9 +72,9 @@ class MicroPost
     }
 
     /**
-     * @return \App\Entity\User|null
+     * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLikedBy(): ?User
+    public function getLikedBy(): Collection
     {
         return $this->likedBy;
     }

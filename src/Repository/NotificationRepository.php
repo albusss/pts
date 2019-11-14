@@ -4,35 +4,11 @@ namespace App\Repository;
 
 use App\Entity\Notification;
 use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
 
-/**
- * @method Notification|null find($id, $lockMode = null, $lockVersion = null)
- * @method Notification|null findOneBy(array $criteria, array $orderBy = null)
- * @method Notification[]    findAll()
- * @method Notification[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-class NotificationRepository extends ServiceEntityRepository
+class NotificationRepository extends BaseRepository implements NotificationRepositoryInterface
 {
     /**
-     * NotificationRepository constructor.
-     *
-     * @param \Doctrine\Common\Persistence\ManagerRegistry $registry
-     */
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Notification::class);
-    }
-
-    /**
-     * Returns count of unseen notifications.
-     *
-     * @param \App\Entity\User $user
-     *
-     * @return int
-     *
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * {@inheritdoc}
      */
     public function findUnseenByUser(User $user): int
     {
@@ -55,11 +31,7 @@ class NotificationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Mark all as read.
-     *
-     * @param \App\Entity\User $user
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function markAllAsReadByUser(User $user): void
     {
@@ -72,5 +44,13 @@ class NotificationRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getEntityClass(): string
+    {
+        return Notification::class;
     }
 }

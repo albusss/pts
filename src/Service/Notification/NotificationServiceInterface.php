@@ -14,6 +14,8 @@ interface NotificationServiceInterface
      * @param \App\Entity\Notification $notification
      *
      * @return void
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
     public function acknowledge(Notification $notification): void;
 

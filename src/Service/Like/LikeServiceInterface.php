@@ -15,6 +15,8 @@ interface LikeServiceInterface
      * @param \App\Entity\MicroPost $post
      *
      * @return void
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
     public function like(User $currentUser, MicroPost $post): void;
 
@@ -25,6 +27,8 @@ interface LikeServiceInterface
      * @param \App\Entity\MicroPost $post
      *
      * @return void
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
     public function unlike(User $currentUser, MicroPost $post): void;
 }
