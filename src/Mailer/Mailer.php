@@ -37,7 +37,18 @@ final class Mailer
         $this->mailFrom = $mailFrom;
     }
 
-    public function sendConfirmation(User $user)
+    /**
+     * Sends confirm email to User.
+     *
+     * @param \App\Entity\User $user
+     *
+     * @return void
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function sendConfirmation(User $user): void
     {
         $message =
             (new \Swift_Message())

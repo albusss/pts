@@ -23,7 +23,14 @@ final class LikeNotificationSubscriber implements EventSubscriber
         ];
     }
 
-    public function onFlush(OnFlushEventArgs $args)
+    /**
+     * @param \Doctrine\ORM\Event\OnFlushEventArgs $args
+     *
+     * @return void
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function onFlush(OnFlushEventArgs $args): void
     {
         $em = $args->getEntityManager();
         $uow = $em->getUnitOfWork();
@@ -40,7 +47,7 @@ final class LikeNotificationSubscriber implements EventSubscriber
 
             $insertDiff = $collectionUpdate->getInsertDiff();
 
-            if (!count($insertDiff)) {
+            if (!\count($insertDiff)) {
                 continue;
             }
 
@@ -51,7 +58,7 @@ final class LikeNotificationSubscriber implements EventSubscriber
             $notification
                 ->setMicroPost($microPost)
                 ->setUser($microPost->getUser())
-                ->setLikedBy(reset($insertDiff));
+                ->setLikedBy(\reset($insertDiff));
 
             $em->persist($notification);
             $uow->computeChangeSet($em->getClassMetadata(LikeNotification::class), $notification);

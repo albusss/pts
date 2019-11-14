@@ -21,11 +21,15 @@ abstract class Notification
 
     /**
      * @ORM\Column(type="boolean")
+     *
+     * @var bool
      */
     private $seen;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     *
+     * @var \App\Entity\User|null
      */
     private $user;
 
@@ -37,39 +41,36 @@ abstract class Notification
         $this->seen = false;
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     *
-     *
-     * @return mixed
+     * @return bool|null
      */
-    public function getSeen()
+    public function getSeen(): ?bool
     {
         return $this->seen;
     }
 
     /**
-     *
-     *
-     * @return mixed
+     * @return \App\Entity\User|null
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
     /**
+     * @param bool|null $seen
      *
-     *
-     * @param mixed $seen
-     *
-     * @return static
+     * @return \App\Entity\Notification
      */
-    public function setSeen($seen = null): self
+    public function setSeen(?bool $seen = null): self
     {
         $this->seen = $seen;
 
@@ -77,13 +78,11 @@ abstract class Notification
     }
 
     /**
+     * @param \App\Entity\User|null $user
      *
-     *
-     * @param mixed $user
-     *
-     * @return static
+     * @return \App\Entity\Notification
      */
-    public function setUser($user = null): self
+    public function setUser(?User $user = null): self
     {
         $this->user = $user;
 

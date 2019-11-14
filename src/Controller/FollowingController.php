@@ -4,53 +4,81 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\Follow\FollowingServiceInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Security("is_granted('ROLE_USER')")
+ *
  * @Route("/following")
  */
 final class FollowingController extends AbstractController
 {
     /**
-     *
-     * @Route("/follow/{id}", name="following_follow")
+     * @var \App\Service\Follow\FollowingServiceInterface
      */
-    public function follow(User $userToFollow)
+    private $service;
+
+    /**
+     * FollowingController constructor.
+     *
+     * @param \App\Service\Follow\FollowingServiceInterface $service
+     */
+    public function __construct(FollowingServiceInterface $service)
     {
-        /** @var \App\Entity\User $currentUser */
-        $currentUser = $this->getUser();
-
-        if ($userToFollow->getId() !== $currentUser->getId()) {
-            $currentUser->follow($userToFollow);
-
-            $this->getDoctrine()->getManager()->flush();
-        }
-
-        return $this->redirectToRoute(
-            'micro_post_user',
-            ['username' => $userToFollow->getUsername()]
-        );
+        $this->service = $service;
     }
 
     /**
+     * Follow User.
      *
-     * @Route("/unfollow/{id}", name="following_unfollow")
+     * @param \App\Entity\User $userToFollow
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Route("/follow/{id}", name="following_follow")
      */
-    public function unfollow(User $userToFollow)
+    public function follow(User $userToFollow): Response
     {
         /** @var \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
 
-        $currentUser->getFollowing()->removeElement($userToFollow);
+        $this->service->follow($currentUser, $userToFollow);
 
-        $this->getDoctrine()->getManager()->flush();
+        return
+            $this->redirectToRoute(
+                'micro_post_user',
+                [
+                    'username' => $userToFollow->getUsername(),
+                ]
+            );
+    }
 
-        return $this->redirectToRoute(
-            'micro_post_user',
-            ['username' => $userToFollow->getUsername()]
-        );
+    /**
+     * Unfollow User.
+     *
+     * @param \App\Entity\User $userToUnfollow
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Route("/unfollow/{id}", name="following_unfollow")
+     */
+    public function unfollow(User $userToUnfollow): Response
+    {
+        /** @var \App\Entity\User $currentUser */
+        $currentUser = $this->getUser();
+
+        $this->service->unfollow($currentUser, $userToUnfollow);
+
+        return
+            $this->redirectToRoute(
+                'micro_post_user',
+                [
+                    'username' => $userToUnfollow->getUsername(),
+                ]
+            );
     }
 }

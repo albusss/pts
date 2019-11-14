@@ -4,68 +4,97 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Notification;
+use App\Service\Notification\NotificationServiceInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Security("is_granted('ROLE_USER')")
+ *
  * @Route("/notification")
  */
 final class NotificationController extends AbstractController
 {
     /**
+     * @var \App\Service\Notification\NotificationServiceInterface
+     */
+    private $notificationService;
+
+    /**
+     * NotificationController constructor.
+     *
+     * @param \App\Service\Notification\NotificationServiceInterface $notificationService
+     */
+    public function __construct(NotificationServiceInterface $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
+    /**
+     * Acknowledge notification.
+     *
+     * @param \App\Entity\Notification $notification
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @Route("/acknowledge/{id}", name="notification_acknowledge")
      */
-    public function acknowledge(Notification $notification)
+    public function acknowledge(Notification $notification): Response
     {
-        $notification->setSeen(true);
-        $this->getDoctrine()->getManager()->flush();
+        $this->notificationService->acknowledge($notification);
 
         return $this->redirectToRoute('notification_all');
     }
 
     /**
+     * Acknowledge all notifications.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @Route("/acknowledge-all", name="notification_acknowledge_all")
      */
-    public function acknowledgeAll()
+    public function acknowledgeAll(): Response
     {
-        /** @var \App\Repository\NotificationRepository $repo */
-        $repo = $this->getDoctrine()->getRepository(Notification::class);
-
-        $repo->markAllAsReadByUser($this->getUser());
-
-        $this->getDoctrine()->getManager()->flush();
+        $this->notificationService->acknowledgeAll($this->getUser());
 
         return $this->redirectToRoute('notification_all');
     }
 
     /**
+     * Returns all of unread User notifications.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      *
      * @Route("/all", name="notification_all")
      */
-    public function notifications()
+    public function notifications(): Response
     {
-        /** @var \App\Repository\NotificationRepository $repo */
-        $repo = $this->getDoctrine()->getRepository(Notification::class);
-
-        return $this->render('notification/notifications.html.twig', [
-            'notifications' => $repo->findBy([
-                'seen' => false,
-                'user' => $this->getUser()
-            ])
-        ]);
+        return
+            $this->render(
+                'notification/notifications.html.twig',
+                [
+                    'notifications' => $this->notificationService->notifications($this->getUser()),
+                ]
+            );
     }
 
     /**
+     * Returns count of unread notifications.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @Route("/unread-count", name="notification_unread")
      */
-    public function unreadCount()
+    public function unreadCount(): Response
     {
-        /** @var \App\Repository\NotificationRepository $repo */
-        $repo = $this->getDoctrine()->getRepository(Notification::class);
-
-        return new JsonResponse(['count' => $repo->findUnseenByUser($this->getUser())]);
+        return
+            new JsonResponse(
+                [
+                    'count' => $this->notificationService->unreadCount($this->getUser()),
+                ]
+            );
     }
 }

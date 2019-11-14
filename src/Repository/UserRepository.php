@@ -14,12 +14,25 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class UserRepository extends ServiceEntityRepository
 {
+    /**
+     * UserRepository constructor.
+     *
+     * @param \Doctrine\Common\Persistence\ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
     }
 
-    public function findAllMoreThanPostsExceptUser(int $count, User $user)
+    /**
+     * Finds more than `count` posts except current User's posts.
+     *
+     * @param int $count
+     * @param \App\Entity\User $user
+     *
+     * @return mixed[]
+     */
+    public function findAllMoreThanPostsExceptUser(int $count, User $user): array
     {
         $qb = $this->createQueryBuilder('u');
 

@@ -11,42 +11,40 @@ class LikeNotification extends Notification
 {
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     *
+     * @var \App\Entity\User
      */
     private $likedBy;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\MicroPost")
+     *
+     * @var \App\Entity\MicroPost
      */
     private $microPost;
 
     /**
-     *
-     *
-     * @return mixed
+     * @return \App\Entity\User|null
      */
-    public function getLikedBy()
+    public function getLikedBy(): ?User
     {
         return $this->likedBy;
     }
 
     /**
-     *
-     *
-     * @return mixed
+     * @return \App\Entity\MicroPost|null
      */
-    public function getMicroPost()
+    public function getMicroPost(): ?MicroPost
     {
         return $this->microPost;
     }
 
     /**
-     *
-     *
-     * @param mixed $likedBy
+     * @param \App\Entity\User|null $likedBy
      *
      * @return self
      */
-    public function setLikedBy($likedBy = null): self
+    public function setLikedBy(?User $likedBy = null): self
     {
         $this->likedBy = $likedBy;
 
@@ -54,13 +52,11 @@ class LikeNotification extends Notification
     }
 
     /**
-     *
-     *
-     * @param mixed $microPost
+     * @param \App\Entity\MicroPost|null $microPost
      *
      * @return self
      */
-    public function setMicroPost($microPost = null): self
+    public function setMicroPost(?MicroPost $microPost = null): self
     {
         $this->microPost = $microPost;
 

@@ -15,12 +15,26 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class NotificationRepository extends ServiceEntityRepository
 {
+    /**
+     * NotificationRepository constructor.
+     *
+     * @param \Doctrine\Common\Persistence\ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Notification::class);
     }
 
-    public function findUnseenByUser(User $user)
+    /**
+     * Returns count of unseen notifications.
+     *
+     * @param \App\Entity\User $user
+     *
+     * @return int
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findUnseenByUser(User $user): int
     {
         $qb = $this->createQueryBuilder('n');
 
@@ -31,10 +45,23 @@ class NotificationRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->setParameter('seen', false);
 
-        return $qb->getQuery()->getSingleScalarResult();
+        $result = $qb->getQuery()->getSingleScalarResult();
+
+        if ($result === null) {
+            return 0;
+        }
+
+        return $result;
     }
 
-    public function markAllAsReadByUser(User $user)
+    /**
+     * Mark all as read.
+     *
+     * @param \App\Entity\User $user
+     *
+     * @return void
+     */
+    public function markAllAsReadByUser(User $user): void
     {
         $qb = $this->createQueryBuilder('n');
 

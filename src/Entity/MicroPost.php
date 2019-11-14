@@ -16,6 +16,8 @@ class MicroPost
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     *
+     * @var int
      */
     private $id;
 
@@ -25,22 +27,30 @@ class MicroPost
      *     joinColumns={@ORM\JoinColumn(name="post_id", referencedColumnName="id")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
      * )
+     *
+     * @var \App\Entity\User[]|null
      */
     private $likedBy;
 
     /**
      * @ORM\Column(type="string", length=280)
+     *
+     * @var string|null
      */
     private $text;
 
     /**
      * @ORM\Column(type="datetime")
+     *
+     * @var \DateTime|null
      */
     private $time;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="posts")
      * @ORM\JoinColumn(nullable=false)
+     *
+     * @var \App\Entity\User|null
      */
     private $user;
 
@@ -52,54 +62,78 @@ class MicroPost
         $this->likedBy = new ArrayCollection();
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     *
-     *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \App\Entity\User|null
      */
-    public function getLikedBy()
+    public function getLikedBy(): ?User
     {
         return $this->likedBy;
     }
 
+    /**
+     * @return string|null
+     */
     public function getText(): ?string
     {
         return $this->text;
     }
 
+    /**
+     * @return \DateTimeInterface|null
+     */
     public function getTime(): ?\DateTimeInterface
     {
         return $this->time;
     }
 
     /**
-     * @return User
+     * @return \App\Entity\User|null
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function like(User $user)
+    /**
+     * @param \App\Entity\User $user
+     *
+     * @return \App\Entity\MicroPost
+     */
+    public function like(User $user): self
     {
         if ($this->likedBy->contains($user) === false) {
             $this->likedBy->add($user);
         }
+
+        return $this;
     }
 
-    public function setText(string $text): self
+    /**
+     * @param string|null $text
+     *
+     * @return \App\Entity\MicroPost
+     */
+    public function setText(?string $text = null): self
     {
         $this->text = $text;
 
         return $this;
     }
 
-    public function setTime(\DateTimeInterface $time): self
+    /**
+     * @param \DateTimeInterface|null $time
+     *
+     * @return \App\Entity\MicroPost
+     */
+    public function setTime(?\DateTimeInterface $time = null): self
     {
         $this->time = $time;
 
@@ -107,24 +141,23 @@ class MicroPost
     }
 
     /**
+     * Sets time before persisting.
      *
      * @ORM\PrePersist()
      *
      * @throws \Exception
      */
-    public function setTimeOnPersist()
+    public function setTimeOnPersist(): void
     {
         $this->time = new \DateTime();
     }
 
     /**
-     *
-     *
-     * @param mixed $user
+     * @param \App\Entity\User|null $user
      *
      * @return self
      */
-    public function setUser($user = null): self
+    public function setUser(?User $user = null): self
     {
         $this->user = $user;
 

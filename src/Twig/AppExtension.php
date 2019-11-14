@@ -26,9 +26,7 @@ final class AppExtension extends AbstractExtension implements GlobalsInterface
     }
 
     /**
-     * Returns a list of global variables to add to the existing list.
-     *
-     * @return array An array of global variables
+     * {@inheritdoc}
      */
     public function getGlobals()
     {
@@ -37,6 +35,9 @@ final class AppExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getTests()
     {
         return [

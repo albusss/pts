@@ -9,15 +9,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class UserSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var \App\Mailer\Mailer|\Swift_Mailer
+     * @var \App\Mailer\Mailer
      */
     private $mailer;
 
     /**
      * UserSubscriber constructor.
      *
-     * @param \Swift_Mailer $mailer
-     * @param \Twig\Environment $twig
+     * @param \App\Mailer\Mailer $mailer
      */
     public function __construct(Mailer $mailer)
     {
@@ -34,7 +33,14 @@ final class UserSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onUserRegister(UserRegisterEvent $event)
+    /**
+     * Sends confirm email to User.
+     *
+     * @param \App\Event\UserRegisterEvent $event
+     *
+     * @return void
+     */
+    public function onUserRegister(UserRegisterEvent $event): void
     {
         $this->mailer->sendConfirmation($event->getRegisteredUser());
     }

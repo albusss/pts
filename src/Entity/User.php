@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -16,12 +17,20 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User implements UserInterface, \Serializable
 {
+    /**
+     * @var string
+     */
     public const ROLE_ADMIN = 'ROLE_ADMIN';
 
+    /**
+     * @var string
+     */
     public const ROLE_USER = 'ROLE_USER';
 
     /**
      * @ORM\Column(type="string", length=32, nullable=true)
+     *
+     * @var string|null
      */
     private $confirmationToken;
 
@@ -29,16 +38,22 @@ class User implements UserInterface, \Serializable
      * @ORM\Column(type="string", length=254, unique=true)
      * @Assert\NotBlank()
      * @Assert\Email()
+     *
+     * @var string|null
      */
     private $email;
 
     /**
      * @ORM\Column(type="boolean")
+     *
+     * @var bool|null
      */
     private $enabled;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="following")
+     *
+     * @var \Doctrine\Common\Collections\Collection|null
      */
     private $followers;
 
@@ -48,6 +63,8 @@ class User implements UserInterface, \Serializable
      *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="following_user_id", referencedColumnName="id")}
      * )
+     *
+     * @var \Doctrine\Common\Collections\Collection|null
      */
     private $following;
 
@@ -55,6 +72,8 @@ class User implements UserInterface, \Serializable
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Length(max="50", min="4")
+     *
+     * @var string|null
      */
     private $fullName;
 
@@ -62,32 +81,44 @@ class User implements UserInterface, \Serializable
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     *
+     * @var int|null
      */
     private $id;
 
     /**
      * @ORM\Column(type="string")
+     *
+     * @var string|null
      */
     private $password;
 
     /**
      * @Assert\NotBlank()
      * @Assert\Length(max="4096", min="8")
+     *
+     * @var string|null
      */
     private $plainPassword;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\MicroPost", mappedBy="user")
+     *
+     * @var \Doctrine\Common\Collections\Collection|null
      */
     private $posts;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\MicroPost", mappedBy="likedBy")
+     *
+     * @var \Doctrine\Common\Collections\Collection|null
      */
     private $postsLiked;
 
     /**
      * @ORM\Column(type="simple_array")
+     *
+     * @var string[]|null
      */
     private $roles;
 
@@ -95,6 +126,8 @@ class User implements UserInterface, \Serializable
      * @ORM\Column(type="string", length=50, unique=true)
      * @Assert\NotBlank()
      * @Assert\Length(max="50", min="5")
+     *
+     * @var string|null
      */
     private $username;
 
@@ -114,114 +147,128 @@ class User implements UserInterface, \Serializable
     {
     }
 
-    public function follow(User $user)
+    /**
+     * @param \App\Entity\User $user
+     *
+     * @return \App\Entity\User
+     */
+    public function follow(User $user): self
     {
         if ($this->getFollowing()->contains($user) === false) {
             $this->getFollowing()->add($user);
         }
+
+        return $this;
     }
 
     /**
-     *
-     *
-     * @return mixed
+     * @return string|null
      */
-    public function getConfirmationToken()
+    public function getConfirmationToken(): ?string
     {
         return $this->confirmationToken;
     }
 
+    /**
+     * @return string|null
+     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
     /**
-     *
-     *
-     * @return mixed
+     * @return bool|null
      */
-    public function getEnabled()
+    public function getEnabled(): ?bool
     {
         return $this->enabled;
     }
 
     /**
-     *
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getFollowers()
+    public function getFollowers(): Collection
     {
         return $this->followers;
     }
 
     /**
-     *
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getFollowing()
+    public function getFollowing(): Collection
     {
         return $this->following;
     }
 
+    /**
+     * @return string|null
+     */
     public function getFullName(): ?string
     {
         return $this->fullName;
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPassword(): ?string
+    /**
+     * @return string|null
+     */
+    public function getPassword()
     {
         return $this->password;
     }
 
     /**
-     *
-     *
-     * @return mixed
+     * @return string|null
      */
-    public function getPlainPassword()
+    public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
     /**
-     *
-     *
-     * @return mixed
+     * @return \Doctrine\Common\Collections\Collection
      */
-    public function getPosts()
+    public function getPosts(): Collection
     {
         return $this->posts;
     }
 
     /**
-     *
-     *
-     * @return mixed
+     * @return \Doctrine\Common\Collections\Collection
      */
-    public function getPostsLiked()
+    public function getPostsLiked(): Collection
     {
         return $this->postsLiked;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getRoles()
     {
         return $this->roles;
     }
 
+    /**
+     * @return string|null
+     */
     public function getSalt()
     {
         return null;
     }
 
-    public function getUsername(): ?string
+    /**
+     * @return string|null
+     */
+    public function getUsername()
     {
         return $this->username;
     }
@@ -244,20 +291,23 @@ class User implements UserInterface, \Serializable
     }
 
     /**
+     * @param string|null $confirmationToken
      *
-     *
-     * @param mixed $confirmationToken
-     *
-     * @return static
+     * @return \App\Entity\User
      */
-    public function setConfirmationToken($confirmationToken = null): self
+    public function setConfirmationToken(?string $confirmationToken = null): self
     {
         $this->confirmationToken = $confirmationToken;
 
         return $this;
     }
 
-    public function setEmail(string $email): self
+    /**
+     * @param string|null $email
+     *
+     * @return \App\Entity\User
+     */
+    public function setEmail(?string $email = null): self
     {
         $this->email = $email;
 
@@ -265,27 +315,35 @@ class User implements UserInterface, \Serializable
     }
 
     /**
+     * @param bool|null $enabled
      *
-     *
-     * @param mixed $enabled
-     *
-     * @return static
+     * @return \App\Entity\User
      */
-    public function setEnabled($enabled = null): self
+    public function setEnabled(?bool $enabled = null): self
     {
         $this->enabled = $enabled;
 
         return $this;
     }
 
-    public function setFullName(string $fullName): self
+    /**
+     * @param string|null $fullName
+     *
+     * @return \App\Entity\User
+     */
+    public function setFullName(?string $fullName = null): self
     {
         $this->fullName = $fullName;
 
         return $this;
     }
 
-    public function setPassword(string $password): self
+    /**
+     * @param string|null $password
+     *
+     * @return \App\Entity\User
+     */
+    public function setPassword(?string $password = null): self
     {
         $this->password = $password;
 
@@ -293,11 +351,11 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * @param mixed $plainPassword
+     * @param string|null $plainPassword
      *
      * @return self
      */
-    public function setPlainPassword($plainPassword = null): self
+    public function setPlainPassword(?string $plainPassword = null): self
     {
         $this->plainPassword = $plainPassword;
 
@@ -305,20 +363,23 @@ class User implements UserInterface, \Serializable
     }
 
     /**
+     * @param string[]|null $roles
      *
-     *
-     * @param mixed $roles
-     *
-     * @return self
+     * @return \App\Entity\User
      */
-    public function setRoles(array $roles = null): self
+    public function setRoles(?array $roles = null): self
     {
         $this->roles = $roles;
 
         return $this;
     }
 
-    public function setUsername(string $username): self
+    /**
+     * @param string|null $username
+     *
+     * @return \App\Entity\User
+     */
+    public function setUsername(?string $username = null): self
     {
         $this->username = $username;
 

@@ -17,6 +17,9 @@ use Symfony\Component\Validator\Constraints\IsTrue;
 
 final class UserType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -36,6 +39,9 @@ final class UserType extends AbstractType
             ->add('Register', SubmitType::class);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

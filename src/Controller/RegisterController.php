@@ -9,19 +9,28 @@ use App\Form\UserType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 final class RegisterController extends AbstractController
 {
     /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface $encoder
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Exception
+     *
      * @Route("/register", name="user_register")
      */
     public function register(
         Request $request,
         UserPasswordEncoderInterface $encoder,
         EventDispatcherInterface $dispatcher
-    ) {
+    ): Response {
         $user = new User();
 
         $form = $this->createForm(UserType::class, $user);
@@ -35,6 +44,7 @@ final class RegisterController extends AbstractController
                 ->setPassword($password)
                 ->setRoles([User::ROLE_USER])
                 ->setConfirmationToken($confirmToken);
+
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
@@ -46,8 +56,11 @@ final class RegisterController extends AbstractController
             return $this->redirectToRoute('micro_post_index');
         }
 
-        return $this->render('register/register.html.twig', [
-            'form' => $form->createView()
-        ]);
+        return $this->render(
+            'register/register.html.twig',
+            [
+                'form' => $form->createView(),
+            ]
+        );
     }
 }

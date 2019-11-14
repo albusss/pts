@@ -8,6 +8,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class UserRegisterEvent extends Event
 {
+    /**
+     * @var string
+     */
     public const NAME = 'user.register';
 
     /**

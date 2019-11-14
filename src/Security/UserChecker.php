@@ -5,16 +5,13 @@ namespace App\Security;
 
 use App\Entity\User;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 final class UserChecker implements UserCheckerInterface
 {
     /**
-     * Checks the user account after authentication.
-     *
-     * @param \App\Entity\User $user
+     * {@inheritdoc}
      */
     public function checkPostAuth(UserInterface $user)
     {
@@ -28,9 +25,7 @@ final class UserChecker implements UserCheckerInterface
     }
 
     /**
-     * Checks the user account before authentication.
-     *
-     * @throws AccountStatusException
+     * {@inheritdoc}
      */
     public function checkPreAuth(UserInterface $user)
     {

@@ -19,19 +19,22 @@ use Symfony\Component\Routing\Annotation\Route;
 final class MicroPostController extends AbstractController
 {
     /**
-     * @Route("/add", name="micro_post_add")
+     * Adds a new Post.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Exception
+     *
+     * @Route("/add", name="micro_post_add")
      */
-    public function add(Request $request)
+    public function add(Request $request): Response
     {
-        if ($this->isGranted(User::ROLE_USER) === false) {
+        if (false === $this->isGranted(User::ROLE_USER)) {
             return $this->redirectToRoute('security_login');
         }
+
         $user = $this->getUser();
         $microPost = new  MicroPost();
         $microPost->setUser($user);
@@ -47,19 +50,25 @@ final class MicroPostController extends AbstractController
             return new RedirectResponse($this->generateUrl('micro_post_index'));
         }
 
-        return $this->render('micro-post/add.html.twig', [
-            'form' => $form->createView()
-        ]);
+        return
+            $this->render(
+                'micro-post/add.html.twig',
+                [
+                    'form' => $form->createView(),
+                ]
+            );
     }
 
     /**
-     * @Route("/delete/{id}", name="micro_post_delete")
+     * Deletes the Post.
      *
      * @param \App\Entity\MicroPost $post
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     *
+     * @Route("/delete/{id}", name="micro_post_delete")
      */
-    public function delete(MicroPost $post)
+    public function delete(MicroPost $post): Response
     {
         $this->denyAccessUnlessGranted(MicroPostVoter::EDIT, $post);
 
@@ -73,14 +82,16 @@ final class MicroPostController extends AbstractController
     }
 
     /**
-     * @Route("/edit/{id}", name="micro_post_edit")
+     * Edits the Post.
      *
      * @param \App\Entity\MicroPost $post
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Route("/edit/{id}", name="micro_post_edit")
      */
-    public function edit(MicroPost $post, Request $request)
+    public function edit(MicroPost $post, Request $request): Response
     {
         $this->denyAccessUnlessGranted(MicroPostVoter::EDIT, $post);
 
@@ -98,9 +109,11 @@ final class MicroPostController extends AbstractController
     }
 
     /**
-     * @Route("/", name="micro_post_index")
+     * Index page.
      *
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Route("/", name="micro_post_index")
      */
     public function index(): Response
     {
@@ -119,39 +132,54 @@ final class MicroPostController extends AbstractController
             $posts = $postRepository->findBy([], ['time' => 'DESC']);
         }
 
-        return $this->render(
-            'micro-post/index.html.twig',
-            [
-                'posts' => $posts,
-                'usersToFollow' => $usersToFollow
-            ]
-        );
+        return
+            $this->render(
+                'micro-post/index.html.twig',
+                [
+                    'posts' => $posts,
+                    'usersToFollow' => $usersToFollow,
+                ]
+            );
     }
 
     /**
-     * @Route("/{id}", name="micro_post_post")
+     * Shows the single Post.
+     *
      * @param \App\Entity\MicroPost $post
      *
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Route("/{id}", name="micro_post_post")
      */
-    public function post(MicroPost $post)
+    public function post(MicroPost $post): Response
     {
-        return $this->render('micro-post/post.html.twig', [
-            'post' => $post
-        ]);
+        return
+            $this->render(
+                'micro-post/post.html.twig',
+                [
+                    'post' => $post,
+                ]
+            );
     }
 
     /**
+     * All User Posts.
      *
-     * @Route("/user/{username}", name="micro_post_user")
+     * @param \App\Entity\User $user
      *
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Route("/user/{username}", name="micro_post_user")
      */
-    public function userPosts(User $user)
+    public function userPosts(User $user): Response
     {
-        return $this->render('micro-post/user-posts.html.twig', [
-            'posts' => $user->getPosts(),
-            'user' => $user,
-        ]);
+        return
+            $this->render(
+                'micro-post/user-posts.html.twig',
+                [
+                    'posts' => $user->getPosts(),
+                    'user' => $user,
+                ]
+            );
     }
 }

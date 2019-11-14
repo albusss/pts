@@ -10,6 +10,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AppFixtures extends Fixture
 {
+    /**
+     * @var string[]
+     */
     private const POST_TEXT = [
         'Hello, how are you?',
         'It\'s nice sunny weather today',
@@ -19,9 +22,12 @@ class AppFixtures extends Fixture
         'I need to go to the doctor',
         'What are you up to today?',
         'Did you watch the game yesterday?',
-        'How was your day?'
+        'How was your day?',
     ];
 
+    /**
+     * @var mixed[]
+     */
     private const USERS = [
         [
             'username' => 'john',
@@ -53,6 +59,8 @@ class AppFixtures extends Fixture
 
     /**
      * AppFixtures constructor.
+     *
+     * @param \Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface $encoder
      */
     public function __construct(UserPasswordEncoderInterface $encoder)
     {
@@ -60,9 +68,7 @@ class AppFixtures extends Fixture
     }
 
     /**
-     * @param \Doctrine\Common\Persistence\ObjectManager $manager
-     *
-     * @return void
+     * {@inheritdoc}
      *
      * @throws \Exception
      */
@@ -72,7 +78,16 @@ class AppFixtures extends Fixture
         $this->loadMicroPosts($manager);
     }
 
-    private function loadMicroPosts(ObjectManager $manager)
+    /**
+     * Loads Microposts.
+     *
+     * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    private function loadMicroPosts(ObjectManager $manager): void
     {
         for ($i = 0; $i <= 30; $i++) {
             $date = new \DateTime();
@@ -92,7 +107,14 @@ class AppFixtures extends Fixture
         $manager->flush();
     }
 
-    private function loadUser(ObjectManager $manager)
+    /**
+     * Loads User.
+     *
+     * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     *
+     * @return void
+     */
+    private function loadUser(ObjectManager $manager): void
     {
         foreach (self::USERS as $userData) {
             $user = new User();

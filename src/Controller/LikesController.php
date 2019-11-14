@@ -4,52 +4,80 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\MicroPost;
-use App\Entity\User;
+use App\Service\Like\LikeServiceInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * @Security("is_granted('ROLE_USER')")
+ *
  * @Route("/likes")
  */
 final class LikesController extends AbstractController
 {
     /**
-     * @Route("/like/{id}", name="likes_like")
-     * @param \App\Entity\MicroPost $post
+     * @var \App\Service\Like\LikeServiceInterface
      */
-    public function like(MicroPost $post)
+    private $likeService;
+
+    /**
+     * LikesController constructor.
+     *
+     * @param \App\Service\Like\LikeServiceInterface $likeService
+     */
+    public function __construct(LikeServiceInterface $likeService)
     {
-        $currentUser = $this->getUser();
-
-        if ($currentUser instanceof User === false) {
-            return new JsonResponse([], Response::HTTP_UNAUTHORIZED);
-        }
-
-        $post->like($currentUser);
-
-        $this->getDoctrine()->getManager()->flush();
-
-        return new JsonResponse(['count' => $post->getLikedBy()->count()]);
+        $this->likeService = $likeService;
     }
 
     /**
-     * @Route("/unlike/{id}", name="likes_unlike")
+     * Likes the Post.
+     *
      * @param \App\Entity\MicroPost $post
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Route("/like/{id}", name="likes_like")
      */
-    public function unlike(MicroPost $post)
+    public function like(MicroPost $post): Response
     {
+        /** @var \App\Entity\User $currentUser */
         $currentUser = $this->getUser();
 
-        if ($currentUser instanceof User === false) {
-            return new JsonResponse([], Response::HTTP_UNAUTHORIZED);
-        }
+        $this->likeService->like($currentUser, $post);
 
-        $post->getLikedBy()->removeElement($currentUser);
+        return
+            new JsonResponse(
+                [
+                    'count' => $post->getLikedBy()->count(),
+                ]
+            );
+    }
 
-        $this->getDoctrine()->getManager()->flush();
+    /**
+     * Unlikes the Post.
+     *
+     * @param \App\Entity\MicroPost $post
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @Route("/unlike/{id}", name="likes_unlike")
+     */
+    public function unlike(MicroPost $post): Response
+    {
+        /** @var \App\Entity\User $currentUser */
+        $currentUser = $this->getUser();
 
-        return new JsonResponse(['count' => $post->getLikedBy()->count()]);
+        $this->likeService->unlike($currentUser, $post);
+
+        return
+            new JsonResponse(
+                [
+                    'count' => $post->getLikedBy()->count(),
+                ]
+            );
     }
 }

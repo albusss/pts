@@ -15,12 +15,24 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class MicroPostRepository extends ServiceEntityRepository
 {
+    /**
+     * MicroPostRepository constructor.
+     *
+     * @param \Doctrine\Common\Persistence\ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, MicroPost::class);
     }
 
-    public function findAllByUsers(Collection $users)
+    /**
+     * Find all microposts by Users.
+     *
+     * @param \Doctrine\Common\Collections\Collection $users
+     *
+     * @return mixed[]
+     */
+    public function findAllByUsers(Collection $users): array
     {
         $qb = $this->createQueryBuilder('p');
 
