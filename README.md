@@ -22,3 +22,7 @@
 * Secure the application and restrict access to certain parts of application to specific users
 * Notifications about events
 
+Botashev Albert
+- Email: alb.botashev@gmail.com
+- LinkedIn: https://www.linkedin.com/in/albusss/
+
